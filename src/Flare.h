@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "Pipe.h"
-
 namespace bro {
 
 class Flare {
@@ -22,7 +20,7 @@ public:
 	 *         Fire()'d and not yet Extinguished()'d.
 	 */
 	int FD() const
-		{ return pipe.ReadFD(); }
+		{ return recvfd; }
 
 	/**
 	 * Put the object in the "ready" state.
@@ -41,7 +39,7 @@ public:
 	int Extinguish(bool signal_safe = false);
 
 private:
-	Pipe pipe;
+	int sendfd, recvfd;
 };
 
 } // namespace bro

@@ -27,9 +27,6 @@ private:
 	unsigned char* set;
 	};
 
-
-#define bzero(p, size) memset(p, 0, size)
-
 inline IntSet::IntSet(unsigned int n)
 	{
 	size = n / 8 + 1;

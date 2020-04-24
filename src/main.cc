@@ -375,6 +375,11 @@ static std::vector<std::string> get_script_signature_files()
 
 static std::string get_exe_path(const std::string& invocation)
 	{
+	char buf[MAX_PATH];
+	auto n = GetModuleFileName(nullptr, buf, sizeof(buf));
+	if ( n < sizeof(buf) )
+		return std::string(buf);
+
 	if ( invocation.empty() )
 		return "";
 

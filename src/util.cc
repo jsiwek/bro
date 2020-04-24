@@ -1112,6 +1112,20 @@ void init_random_seed(const char* read_file, const char* write_file)
 			seeds_done = true;
 		}
 
+	seeds_done = true;
+
+#if 0 // defined(_WIN32) || defined(_WIN64)
+	if ( ! seeds_done )
+		{
+		auto status = BCryptGenRandom(nullptr, reinterpret_cast<PUCHAR>(buf), sizeof(buf), 0);
+		if ( ! NT_SUCCESS(status) )
+			reporter->FatalError("Could not get random number: BCryptGenRandom returned %x.\n",
+					     status);
+		else
+			seeds_done = true;
+		}
+#endif
+
 #ifdef HAVE_GETRANDOM
 	if ( ! seeds_done )
 		{
@@ -1715,7 +1729,8 @@ static string find_file_in_path(const string& filename, const string& path,
 		return string();
 
 	// If file name is an absolute path, searching within *path* is pointless.
-	if ( filename[0] == '/' )
+	if ( filename[0] == '/' ||
+	    (filename.size() >2 && isalpha(filename[0]) && filename[1] == ':' && filename[2] == '/') )
 		{
 		if ( can_read(filename) )
 			return filename;
@@ -1746,7 +1761,7 @@ string find_file(const string& filename, const string& path_set,
                  const string& opt_ext)
 	{
 	vector<string> paths;
-	tokenize_string(path_set, ":", &paths);
+	tokenize_string(path_set, ";", &paths);
 
 	vector<string> ext;
 	if ( ! opt_ext.empty() )
@@ -1766,7 +1781,7 @@ string find_file(const string& filename, const string& path_set,
 string find_script_file(const string& filename, const string& path_set)
 	{
 	vector<string> paths;
-	tokenize_string(path_set, ":", &paths);
+	tokenize_string(path_set, ";", &paths);
 
 	vector<string> ext(script_extensions.begin(), script_extensions.end());
 
@@ -1860,7 +1875,11 @@ double parse_rotate_base_time(const char* rotate_base_time)
 		{
 		struct tm t;
 		if ( ! strptime(rotate_base_time, "%H:%M", &t) )
-			reporter->Error("calc_next_rotate(): can't parse rotation base time");
+			{
+			reporter->Warning("calc_next_rotate(): can't parse rotation base time");
+			base = 86400;
+			}
+		
 		else
 			base = t.tm_min * 60 + t.tm_hour * 60 * 60;
 		}
