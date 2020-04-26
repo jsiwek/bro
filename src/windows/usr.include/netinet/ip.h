@@ -5,11 +5,11 @@
 
 struct ip {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned ip_hl:4;
-	unsigned ip_v:4;
+	uint8_t ip_hl:4;
+	uint8_t ip_v:4;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned ip_v:4;
-	unsigned ip_hl:4;
+	uint8_t ip_v:4;
+	uint8_t ip_hl:4;
 #else
 #error Unknown byte order.
 #endif
